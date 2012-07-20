@@ -16,15 +16,12 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_EXECUTIONENGINE_H
-#define LLVM_C_EXECUTIONENGINE_H
+module deimos.llvm.c.enhanceddisassembly;
 
-#include "llvm-c/Core.h"
-#include "llvm-c/Target.h"
+import deimos.llvm.c.core;
+import deimos.llvm.c.target;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCExecutionEngine Execution Engine
@@ -33,25 +30,27 @@ extern "C" {
  * @{
  */
 
-void LLVMLinkInJIT(void);
-void LLVMLinkInInterpreter(void);
+void LLVMLinkInJIT();
+void LLVMLinkInInterpreter();
 
-typedef struct LLVMOpaqueGenericValue *LLVMGenericValueRef;
-typedef struct LLVMOpaqueExecutionEngine *LLVMExecutionEngineRef;
+struct __LLVMOpaqueGenericValue {};
+alias __LLVMOpaqueGenericValue *LLVMGenericValueRef;
+struct __LLVMOpaqueExecutionEngine {};
+alias __LLVMOpaqueExecutionEngine *LLVMExecutionEngineRef;
 
 /*===-- Operations on generic values --------------------------------------===*/
 
 LLVMGenericValueRef LLVMCreateGenericValueOfInt(LLVMTypeRef Ty,
-                                                unsigned long long N,
+                                                ulong N,
                                                 LLVMBool IsSigned);
 
 LLVMGenericValueRef LLVMCreateGenericValueOfPointer(void *P);
 
 LLVMGenericValueRef LLVMCreateGenericValueOfFloat(LLVMTypeRef Ty, double N);
 
-unsigned LLVMGenericValueIntWidth(LLVMGenericValueRef GenValRef);
+uint LLVMGenericValueIntWidth(LLVMGenericValueRef GenValRef);
 
-unsigned long long LLVMGenericValueToInt(LLVMGenericValueRef GenVal,
+ulong LLVMGenericValueToInt(LLVMGenericValueRef GenVal,
                                          LLVMBool IsSigned);
 
 void *LLVMGenericValueToPointer(LLVMGenericValueRef GenVal);
@@ -72,7 +71,7 @@ LLVMBool LLVMCreateInterpreterForModule(LLVMExecutionEngineRef *OutInterp,
 
 LLVMBool LLVMCreateJITCompilerForModule(LLVMExecutionEngineRef *OutJIT,
                                         LLVMModuleRef M,
-                                        unsigned OptLevel,
+                                        uint OptLevel,
                                         char **OutError);
 
 /** Deprecated: Use LLVMCreateExecutionEngineForModule instead. */
@@ -88,7 +87,7 @@ LLVMBool LLVMCreateInterpreter(LLVMExecutionEngineRef *OutInterp,
 /** Deprecated: Use LLVMCreateJITCompilerForModule instead. */
 LLVMBool LLVMCreateJITCompiler(LLVMExecutionEngineRef *OutJIT,
                                LLVMModuleProviderRef MP,
-                               unsigned OptLevel,
+                               uint OptLevel,
                                char **OutError);
 
 void LLVMDisposeExecutionEngine(LLVMExecutionEngineRef EE);
@@ -98,11 +97,11 @@ void LLVMRunStaticConstructors(LLVMExecutionEngineRef EE);
 void LLVMRunStaticDestructors(LLVMExecutionEngineRef EE);
 
 int LLVMRunFunctionAsMain(LLVMExecutionEngineRef EE, LLVMValueRef F,
-                          unsigned ArgC, const char * const *ArgV,
-                          const char * const *EnvP);
+                          uint ArgC, const(char*) *ArgV,
+                          const(char*) *EnvP);
 
 LLVMGenericValueRef LLVMRunFunction(LLVMExecutionEngineRef EE, LLVMValueRef F,
-                                    unsigned NumArgs,
+                                    uint NumArgs,
                                     LLVMGenericValueRef *Args);
 
 void LLVMFreeMachineCodeForFunction(LLVMExecutionEngineRef EE, LLVMValueRef F);
@@ -120,7 +119,7 @@ LLVMBool LLVMRemoveModuleProvider(LLVMExecutionEngineRef EE,
                                   LLVMModuleProviderRef MP,
                                   LLVMModuleRef *OutMod, char **OutError);
 
-LLVMBool LLVMFindFunction(LLVMExecutionEngineRef EE, const char *Name,
+LLVMBool LLVMFindFunction(LLVMExecutionEngineRef EE, const(char) *Name,
                           LLVMValueRef *OutFn);
 
 void *LLVMRecompileAndRelinkFunction(LLVMExecutionEngineRef EE, LLVMValueRef Fn);
@@ -135,29 +134,3 @@ void *LLVMGetPointerToGlobal(LLVMExecutionEngineRef EE, LLVMValueRef Global);
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-
-namespace llvm {
-  struct GenericValue;
-  class ExecutionEngine;
-  
-  #define DEFINE_SIMPLE_CONVERSION_FUNCTIONS(ty, ref)   \
-    inline ty *unwrap(ref P) {                          \
-      return reinterpret_cast<ty*>(P);                  \
-    }                                                   \
-                                                        \
-    inline ref wrap(const ty *P) {                      \
-      return reinterpret_cast<ref>(const_cast<ty*>(P)); \
-    }
-  
-  DEFINE_SIMPLE_CONVERSION_FUNCTIONS(GenericValue,    LLVMGenericValueRef   )
-  DEFINE_SIMPLE_CONVERSION_FUNCTIONS(ExecutionEngine, LLVMExecutionEngineRef)
-  
-  #undef DEFINE_SIMPLE_CONVERSION_FUNCTIONS
-}
-  
-#endif /* defined(__cplusplus) */
-
-#endif

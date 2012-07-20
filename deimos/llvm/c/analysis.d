@@ -16,14 +16,11 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_ANALYSIS_H
-#define LLVM_C_ANALYSIS_H
+module deimos.llvm.c.analysis;
 
-#include "llvm-c/Core.h"
+import deimos.llvm.c.core;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCAnalysis Analysis
@@ -32,11 +29,11 @@ extern "C" {
  * @{
  */
 
-typedef enum {
+enum LLVMVerifierFailureAction {
   LLVMAbortProcessAction, /* verifier will print to stderr and abort() */
   LLVMPrintMessageAction, /* verifier will print to stderr and return 1 */
   LLVMReturnStatusAction  /* verifier will just return 1 */
-} LLVMVerifierFailureAction;
+}
 
 
 /* Verifies that a module is valid, taking the specified action if not.
@@ -57,9 +54,3 @@ void LLVMViewFunctionCFGOnly(LLVMValueRef Fn);
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

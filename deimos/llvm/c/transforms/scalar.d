@@ -16,14 +16,11 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_TRANSFORMS_SCALAR_H
-#define LLVM_C_TRANSFORMS_SCALAR_H
+module deimos.llvm.c.transforms.scalar;
 
-#include "llvm-c/Core.h"
+import deimos.llvm.c.core;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCTransformsScalar Scalar transformations
@@ -126,9 +123,3 @@ void LLVMAddBasicAliasAnalysisPass(LLVMPassManagerRef PM);
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-#endif /* defined(__cplusplus) */
-
-#endif

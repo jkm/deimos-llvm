@@ -16,14 +16,11 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_BITCODEWRITER_H
-#define LLVM_C_BITCODEWRITER_H
+module deimos.llvm.c.bitwriter;
 
-#include "llvm-c/Core.h"
+import deimos.llvm.c.core;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCBitWriter Bit Writer
@@ -35,7 +32,7 @@ extern "C" {
 /*===-- Operations on modules ---------------------------------------------===*/
 
 /** Writes a module to the specified path. Returns 0 on success. */ 
-int LLVMWriteBitcodeToFile(LLVMModuleRef M, const char *Path);
+int LLVMWriteBitcodeToFile(LLVMModuleRef M, const(char) *Path);
 
 /** Writes a module to an open file descriptor. Returns 0 on success. */
 int LLVMWriteBitcodeToFD(LLVMModuleRef M, int FD, int ShouldClose,
@@ -48,9 +45,3 @@ int LLVMWriteBitcodeToFileHandle(LLVMModuleRef M, int Handle);
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

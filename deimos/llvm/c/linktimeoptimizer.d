@@ -13,12 +13,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __LTO_CAPI_H__
-#define __LTO_CAPI_H__
+module deimos.llvm.c.linktimeoptimizer;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+import deimos.llvm.c.core;
+
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCLinkTimeOptimizer Link Time Optimization
@@ -28,11 +27,11 @@ extern "C" {
  */
 
   /// This provides a dummy type for pointers to the LTO object.
-  typedef void* llvm_lto_t;
+  alias void* llvm_lto_t;
 
   /// This provides a C-visible enumerator to manage status codes.
   /// This should map exactly onto the C++ enumerator LTOStatus.
-  typedef enum llvm_lto_status {
+  enum llvm_lto_status {
     LLVM_LTO_UNKNOWN,
     LLVM_LTO_OPT_SUCCESS,
     LLVM_LTO_READ_SUCCESS,
@@ -45,25 +44,20 @@ extern "C" {
 
     //  Added C-specific error codes
     LLVM_LTO_NULL_OBJECT
-  } llvm_lto_status_t;
+  }
+  alias llvm_lto_status llvm_lto_status_t;
  
   /// This provides C interface to initialize link time optimizer. This allows
   /// linker to use dlopen() interface to dynamically load LinkTimeOptimizer.
   /// extern "C" helps, because dlopen() interface uses name to find the symbol.
-  extern llvm_lto_t llvm_create_optimizer(void);
+  extern llvm_lto_t llvm_create_optimizer();
   extern void llvm_destroy_optimizer(llvm_lto_t lto);
 
   extern llvm_lto_status_t llvm_read_object_file
-    (llvm_lto_t lto, const char* input_filename);
+    (llvm_lto_t lto, const(char)* input_filename);
   extern llvm_lto_status_t llvm_optimize_modules
-    (llvm_lto_t lto, const char* output_filename);
+    (llvm_lto_t lto, const(char)* output_filename);
 
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

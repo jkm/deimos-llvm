@@ -12,14 +12,11 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_TRANSFORMS_IPO_H
-#define LLVM_C_TRANSFORMS_IPO_H
+module deimos.llvm.c.transforms.ipo;
 
-#include "llvm-c/Core.h"
+import deimos.llvm.c.core;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCTransformsIPO Interprocedural transformations
@@ -62,7 +59,7 @@ void LLVMAddPruneEHPass(LLVMPassManagerRef PM);
 void LLVMAddIPSCCPPass(LLVMPassManagerRef PM);
 
 /** See llvm::createInternalizePass function. */
-void LLVMAddInternalizePass(LLVMPassManagerRef, unsigned AllButMain);
+void LLVMAddInternalizePass(LLVMPassManagerRef, uint AllButMain);
 
 /** See llvm::createStripDeadPrototypesPass function. */
 void LLVMAddStripDeadPrototypesPass(LLVMPassManagerRef PM);
@@ -73,9 +70,3 @@ void LLVMAddStripSymbolsPass(LLVMPassManagerRef PM);
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-#endif /* defined(__cplusplus) */
-
-#endif

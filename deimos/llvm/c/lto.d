@@ -13,12 +13,12 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LTO_H
-#define LTO_H  1
+module deimos.llvm.c.lto;
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <unistd.h>
+import core.stdc.stddef;
+import core.sys.posix.unistd;
+
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCLTO LTO
@@ -27,9 +27,9 @@
  * @{
  */
 
-#define LTO_API_VERSION 4
+enum LTO_API_VERSION = 4;
 
-typedef enum {
+enum lto_symbol_attributes {
     LTO_SYMBOL_ALIGNMENT_MASK              = 0x0000001F, /* log2 of alignment */
     LTO_SYMBOL_PERMISSIONS_MASK            = 0x000000E0,
     LTO_SYMBOL_PERMISSIONS_CODE            = 0x000000A0,
@@ -47,71 +47,69 @@ typedef enum {
     LTO_SYMBOL_SCOPE_PROTECTED             = 0x00002000,
     LTO_SYMBOL_SCOPE_DEFAULT               = 0x00001800,
     LTO_SYMBOL_SCOPE_DEFAULT_CAN_BE_HIDDEN = 0x00002800
-} lto_symbol_attributes;
+}
 
-typedef enum {
+enum lto_debug_model {
     LTO_DEBUG_MODEL_NONE         = 0,
     LTO_DEBUG_MODEL_DWARF        = 1
-} lto_debug_model;
+}
 
-typedef enum {
+enum lto_codegen_model {
     LTO_CODEGEN_PIC_MODEL_STATIC         = 0,
     LTO_CODEGEN_PIC_MODEL_DYNAMIC        = 1,
     LTO_CODEGEN_PIC_MODEL_DYNAMIC_NO_PIC = 2
-} lto_codegen_model;
+}
 
 
 /** opaque reference to a loaded object module */
-typedef struct LTOModule*         lto_module_t;
+struct __LTOModule {};
+alias __LTOModule*         lto_module_t;
 
 /** opaque reference to a code generator */
-typedef struct LTOCodeGenerator*  lto_code_gen_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct __LTOCodeGenerator  {};
+alias __LTOCodeGenerator*  lto_code_gen_t;
 
 /**
  * Returns a printable string.
  */
-extern const char*
-lto_get_version(void);
+extern const(char)*
+lto_get_version();
 
 
 /**
  * Returns the last error string or NULL if last operation was successful.
  */
-extern const char*
-lto_get_error_message(void);
+extern const(char)*
+lto_get_error_message();
 
 /**
  * Checks if a file is a loadable object file.
  */
 extern bool
-lto_module_is_object_file(const char* path);
+lto_module_is_object_file(const(char)* path);
 
 
 /**
  * Checks if a file is a loadable object compiled for requested target.
  */
 extern bool
-lto_module_is_object_file_for_target(const char* path,
-                                     const char* target_triple_prefix);
+lto_module_is_object_file_for_target(const(char)* path,
+                                     const(char)* target_triple_prefix);
 
 
 /**
  * Checks if a buffer is a loadable object file.
  */
 extern bool
-lto_module_is_object_file_in_memory(const void* mem, size_t length);
+lto_module_is_object_file_in_memory(const(void)* mem, size_t length);
 
 
 /**
  * Checks if a buffer is a loadable object compiled for requested target.
  */
 extern bool
-lto_module_is_object_file_in_memory_for_target(const void* mem, size_t length,
-                                              const char* target_triple_prefix);
+lto_module_is_object_file_in_memory_for_target(const(void)* mem, size_t length,
+                                              const(char)* target_triple_prefix);
 
 
 /**
@@ -119,7 +117,7 @@ lto_module_is_object_file_in_memory_for_target(const void* mem, size_t length,
  * Returns NULL on error (check lto_get_error_message() for details).
  */
 extern lto_module_t
-lto_module_create(const char* path);
+lto_module_create(const(char)* path);
 
 
 /**
@@ -127,21 +125,21 @@ lto_module_create(const char* path);
  * Returns NULL on error (check lto_get_error_message() for details).
  */
 extern lto_module_t
-lto_module_create_from_memory(const void* mem, size_t length);
+lto_module_create_from_memory(const(void)* mem, size_t length);
 
 /**
  * Loads an object file from disk. The seek point of fd is not preserved.
  * Returns NULL on error (check lto_get_error_message() for details).
  */
 extern lto_module_t
-lto_module_create_from_fd(int fd, const char *path, size_t file_size);
+lto_module_create_from_fd(int fd, const(char) *path, size_t file_size);
 
 /**
  * Loads an object file from disk. The seek point of fd is not preserved.
  * Returns NULL on error (check lto_get_error_message() for details).
  */
 extern lto_module_t
-lto_module_create_from_fd_at_offset(int fd, const char *path, size_t file_size,
+lto_module_create_from_fd_at_offset(int fd, const(char) *path, size_t file_size,
                                     size_t map_size, off_t offset);
 
 
@@ -156,35 +154,35 @@ lto_module_dispose(lto_module_t mod);
 /**
  * Returns triple string which the object module was compiled under.
  */
-extern const char*
+extern const(char)*
 lto_module_get_target_triple(lto_module_t mod);
 
 /**
  * Sets triple string with which the object will be codegened.
  */
 extern void
-lto_module_set_target_triple(lto_module_t mod, const char *triple);
+lto_module_set_target_triple(lto_module_t mod, const(char) *triple);
 
 
 /**
  * Returns the number of symbols in the object module.
  */
-extern unsigned int
+extern uint
 lto_module_get_num_symbols(lto_module_t mod);
 
 
 /**
  * Returns the name of the ith symbol in the object module.
  */
-extern const char*
-lto_module_get_symbol_name(lto_module_t mod, unsigned int index);
+extern const(char)*
+lto_module_get_symbol_name(lto_module_t mod, uint index);
 
 
 /**
  * Returns the attributes of the ith symbol in the object module.
  */
 extern lto_symbol_attributes
-lto_module_get_symbol_attribute(lto_module_t mod, unsigned int index);
+lto_module_get_symbol_attribute(lto_module_t mod, uint index);
 
 
 /**
@@ -192,7 +190,7 @@ lto_module_get_symbol_attribute(lto_module_t mod, unsigned int index);
  * Returns NULL on error (check lto_get_error_message() for details).
  */
 extern lto_code_gen_t
-lto_codegen_create(void);
+lto_codegen_create();
 
 
 /**
@@ -233,7 +231,7 @@ lto_codegen_set_pic_model(lto_code_gen_t cg, lto_codegen_model);
  * Sets the cpu to generate code for.
  */
 extern void
-lto_codegen_set_cpu(lto_code_gen_t cg, const char *cpu);
+lto_codegen_set_cpu(lto_code_gen_t cg, const(char) *cpu);
 
 
 /**
@@ -241,13 +239,13 @@ lto_codegen_set_cpu(lto_code_gen_t cg, const char *cpu);
  * will use gcc to invoke the assembler.
  */
 extern void
-lto_codegen_set_assembler_path(lto_code_gen_t cg, const char* path);
+lto_codegen_set_assembler_path(lto_code_gen_t cg, const(char)* path);
 
 /**
  * Sets extra arguments that libLTO should pass to the assembler.
  */
 extern void
-lto_codegen_set_assembler_args(lto_code_gen_t cg, const char **args,
+lto_codegen_set_assembler_args(lto_code_gen_t cg, const(char) **args,
                                int nargs);
 
 /**
@@ -256,7 +254,7 @@ lto_codegen_set_assembler_args(lto_code_gen_t cg, const char **args,
  * inlined into every usage and optimized away.
  */
 extern void
-lto_codegen_add_must_preserve_symbol(lto_code_gen_t cg, const char* symbol);
+lto_codegen_add_must_preserve_symbol(lto_code_gen_t cg, const(char)* symbol);
 
 /**
  * Writes a new object file at the specified path that contains the
@@ -264,7 +262,7 @@ lto_codegen_add_must_preserve_symbol(lto_code_gen_t cg, const char* symbol);
  * Returns true on error (check lto_get_error_message() for details).
  */
 extern bool
-lto_codegen_write_merged_modules(lto_code_gen_t cg, const char* path);
+lto_codegen_write_merged_modules(lto_code_gen_t cg, const(char)* path);
 
 /**
  * Generates code for all added modules into one native object file.
@@ -274,7 +272,7 @@ lto_codegen_write_merged_modules(lto_code_gen_t cg, const char* path);
  * is called, or lto_codegen_compile() is called again.
  * On failure, returns NULL (check lto_get_error_message() for details).
  */
-extern const void*
+extern const(void)*
 lto_codegen_compile(lto_code_gen_t cg, size_t* length);
 
 /**
@@ -282,21 +280,15 @@ lto_codegen_compile(lto_code_gen_t cg, size_t* length);
  * The name of the file is written to name. Returns true on error.
  */
 extern bool
-lto_codegen_compile_to_file(lto_code_gen_t cg, const char** name);
+lto_codegen_compile_to_file(lto_code_gen_t cg, const(char)** name);
 
 
 /**
  * Sets options to help debug codegen bugs.
  */
 extern void
-lto_codegen_debug_options(lto_code_gen_t cg, const char *);
-
-#ifdef __cplusplus
-}
-#endif
+lto_codegen_debug_options(lto_code_gen_t cg, const(char) *);
 
 /**
  * @}
  */
-
-#endif

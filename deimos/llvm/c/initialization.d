@@ -13,14 +13,11 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_INITIALIZEPASSES_H
-#define LLVM_C_INITIALIZEPASSES_H
+module deimos.llvm.c.initialization;
 
-#include "llvm-c/Core.h"
+import deimos.llvm.c.core;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCInitialization Initialization Routines
@@ -46,9 +43,3 @@ void LLVMInitializeTarget(LLVMPassRegistryRef R);
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

@@ -16,14 +16,11 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_BITCODEREADER_H
-#define LLVM_C_BITCODEREADER_H
+module deimos.llvm.c.bitreader;
 
-#include "llvm-c/Core.h"
+import deimos.llvm.c.core;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCBitReader Bit Reader
@@ -68,9 +65,3 @@ LLVMBool LLVMGetBitcodeModuleProvider(LLVMMemoryBufferRef MemBuf,
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

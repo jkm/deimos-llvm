@@ -16,17 +16,12 @@
 /*                                                                            */
 /*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_OBJECT_H
-#define LLVM_C_OBJECT_H
+module deimos.llvm.c.object;
 
-#include "llvm-c/Core.h"
-#include "llvm/Config/llvm-config.h"
+import core.stdc.stdint : uint64_t;
+import deimos.llvm.c.core;
 
-#ifdef __cplusplus
-#include "llvm/Object/ObjectFile.h"
-
-extern "C" {
-#endif
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCObject Object file reading and writing
@@ -36,10 +31,14 @@ extern "C" {
  */
 
 // Opaque type wrappers
-typedef struct LLVMOpaqueObjectFile *LLVMObjectFileRef;
-typedef struct LLVMOpaqueSectionIterator *LLVMSectionIteratorRef;
-typedef struct LLVMOpaqueSymbolIterator *LLVMSymbolIteratorRef;
-typedef struct LLVMOpaqueRelocationIterator *LLVMRelocationIteratorRef;
+struct __LLVMOpaqueObjectFile {};
+alias __LLVMOpaqueObjectFile *LLVMObjectFileRef;
+struct __LLVMOpaqueSectionIterator {};
+alias __LLVMOpaqueSectionIterator *LLVMSectionIteratorRef;
+struct __LLVMOpaqueSymbolIterator {};
+alias __LLVMOpaqueSymbolIterator *LLVMSymbolIteratorRef;
+struct __LLVMOpaqueRelocationIterator {};
+alias __LLVMOpaqueRelocationIterator *LLVMRelocationIteratorRef;
 
 // ObjectFile creation
 LLVMObjectFileRef LLVMCreateObjectFile(LLVMMemoryBufferRef MemBuf);
@@ -62,9 +61,9 @@ LLVMBool LLVMIsSymbolIteratorAtEnd(LLVMObjectFileRef ObjectFile,
 void LLVMMoveToNextSymbol(LLVMSymbolIteratorRef SI);
 
 // SectionRef accessors
-const char *LLVMGetSectionName(LLVMSectionIteratorRef SI);
+const(char) *LLVMGetSectionName(LLVMSectionIteratorRef SI);
 uint64_t LLVMGetSectionSize(LLVMSectionIteratorRef SI);
-const char *LLVMGetSectionContents(LLVMSectionIteratorRef SI);
+const(char) *LLVMGetSectionContents(LLVMSectionIteratorRef SI);
 uint64_t LLVMGetSectionAddress(LLVMSectionIteratorRef SI);
 LLVMBool LLVMGetSectionContainsSymbol(LLVMSectionIteratorRef SI,
                                  LLVMSymbolIteratorRef Sym);
@@ -78,7 +77,7 @@ void LLVMMoveToNextRelocation(LLVMRelocationIteratorRef RI);
 
 
 // SymbolRef accessors
-const char *LLVMGetSymbolName(LLVMSymbolIteratorRef SI);
+const(char) *LLVMGetSymbolName(LLVMSymbolIteratorRef SI);
 uint64_t LLVMGetSymbolAddress(LLVMSymbolIteratorRef SI);
 uint64_t LLVMGetSymbolFileOffset(LLVMSymbolIteratorRef SI);
 uint64_t LLVMGetSymbolSize(LLVMSymbolIteratorRef SI);
@@ -90,60 +89,9 @@ LLVMSymbolIteratorRef LLVMGetRelocationSymbol(LLVMRelocationIteratorRef RI);
 uint64_t LLVMGetRelocationType(LLVMRelocationIteratorRef RI);
 // NOTE: Caller takes ownership of returned string of the two
 // following functions.
-const char *LLVMGetRelocationTypeName(LLVMRelocationIteratorRef RI);
-const char *LLVMGetRelocationValueString(LLVMRelocationIteratorRef RI);
+const(char) *LLVMGetRelocationTypeName(LLVMRelocationIteratorRef RI);
+const(char) *LLVMGetRelocationValueString(LLVMRelocationIteratorRef RI);
 
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-
-namespace llvm {
-  namespace object {
-    inline ObjectFile *unwrap(LLVMObjectFileRef OF) {
-      return reinterpret_cast<ObjectFile*>(OF);
-    }
-
-    inline LLVMObjectFileRef wrap(const ObjectFile *OF) {
-      return reinterpret_cast<LLVMObjectFileRef>(const_cast<ObjectFile*>(OF));
-    }
-
-    inline section_iterator *unwrap(LLVMSectionIteratorRef SI) {
-      return reinterpret_cast<section_iterator*>(SI);
-    }
-
-    inline LLVMSectionIteratorRef
-    wrap(const section_iterator *SI) {
-      return reinterpret_cast<LLVMSectionIteratorRef>
-        (const_cast<section_iterator*>(SI));
-    }
-
-    inline symbol_iterator *unwrap(LLVMSymbolIteratorRef SI) {
-      return reinterpret_cast<symbol_iterator*>(SI);
-    }
-
-    inline LLVMSymbolIteratorRef
-    wrap(const symbol_iterator *SI) {
-      return reinterpret_cast<LLVMSymbolIteratorRef>
-        (const_cast<symbol_iterator*>(SI));
-    }
-
-    inline relocation_iterator *unwrap(LLVMRelocationIteratorRef SI) {
-      return reinterpret_cast<relocation_iterator*>(SI);
-    }
-
-    inline LLVMRelocationIteratorRef
-    wrap(const relocation_iterator *SI) {
-      return reinterpret_cast<LLVMRelocationIteratorRef>
-        (const_cast<relocation_iterator*>(SI));
-    }
-
-  }
-}
-
-#endif /* defined(__cplusplus) */
-
-#endif
-

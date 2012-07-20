@@ -11,17 +11,14 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_PASSMANAGERBUILDER
-#define LLVM_C_PASSMANAGERBUILDER
+module deimos.llvm.c.transforms.passmanagerbuilder;
 
-#include "llvm-c/Core.h"
+import deimos.llvm.c.core;
 
-typedef struct LLVMOpaquePassManagerBuilder *LLVMPassManagerBuilderRef;
+extern(C) nothrow:
 
-#ifdef __cplusplus
-#include "llvm/Transforms/IPO/PassManagerBuilder.h"
-extern "C" {
-#endif
+struct __LLVMOpaquePassManagerBuilder {};
+alias __LLVMOpaquePassManagerBuilder *LLVMPassManagerBuilderRef;
 
 /**
  * @defgroup LLVMCTransformsPassManagerBuilder Pass manager builder
@@ -31,18 +28,18 @@ extern "C" {
  */
 
 /** See llvm::PassManagerBuilder. */
-LLVMPassManagerBuilderRef LLVMPassManagerBuilderCreate(void);
+LLVMPassManagerBuilderRef LLVMPassManagerBuilderCreate();
 void LLVMPassManagerBuilderDispose(LLVMPassManagerBuilderRef PMB);
 
 /** See llvm::PassManagerBuilder::OptLevel. */
 void
 LLVMPassManagerBuilderSetOptLevel(LLVMPassManagerBuilderRef PMB,
-                                  unsigned OptLevel);
+                                  uint OptLevel);
 
 /** See llvm::PassManagerBuilder::SizeLevel. */
 void
 LLVMPassManagerBuilderSetSizeLevel(LLVMPassManagerBuilderRef PMB,
-                                   unsigned SizeLevel);
+                                   uint SizeLevel);
 
 /** See llvm::PassManagerBuilder::DisableUnitAtATime. */
 void
@@ -62,7 +59,7 @@ LLVMPassManagerBuilderSetDisableSimplifyLibCalls(LLVMPassManagerBuilderRef PMB,
 /** See llvm::PassManagerBuilder::Inliner. */
 void
 LLVMPassManagerBuilderUseInlinerWithThreshold(LLVMPassManagerBuilderRef PMB,
-                                              unsigned Threshold);
+                                              uint Threshold);
 
 /** See llvm::PassManagerBuilder::populateFunctionPassManager. */
 void
@@ -83,19 +80,3 @@ void LLVMPassManagerBuilderPopulateLTOPassManager(LLVMPassManagerBuilderRef PMB,
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-
-namespace llvm {
-  inline PassManagerBuilder *unwrap(LLVMPassManagerBuilderRef P) {
-    return reinterpret_cast<PassManagerBuilder*>(P);
-  }
-
-  inline LLVMPassManagerBuilderRef wrap(PassManagerBuilder *P) {
-    return reinterpret_cast<LLVMPassManagerBuilderRef>(P);
-  }
-}
-#endif
-
-#endif

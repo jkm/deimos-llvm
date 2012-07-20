@@ -16,14 +16,12 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_ENHANCEDDISASSEMBLY_H
-#define LLVM_C_ENHANCEDDISASSEMBLY_H
+module deimos.llvm.c.enhanceddisassembly;
 
-#include "llvm/Support/DataTypes.h"
+import core.stdc.stdint : uint8_t, uint64_t;
+import core.stdc.stddef;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCEnhancedDisassembly Enhanced Disassembly
@@ -46,7 +44,7 @@ extern "C" {
  @param arg An anonymous argument for client use.
  @result 0 on success; -1 otherwise.
  */
-typedef int (*EDByteReaderCallback)(uint8_t *byte, uint64_t address, void *arg);
+alias int function(uint8_t *byte_, uint64_t address, void *arg) EDByteReaderCallback;
 
 /*!
  @typedef EDRegisterReaderCallback
@@ -57,8 +55,8 @@ typedef int (*EDByteReaderCallback)(uint8_t *byte, uint64_t address, void *arg);
  @param arg An anonymous argument for client use.
  @result 0 if the register could be read; -1 otherwise.
  */
-typedef int (*EDRegisterReaderCallback)(uint64_t *value, unsigned regID,
-                                        void* arg);
+alias int function(uint64_t *value, uint regID,
+                   void* arg) EDRegisterReaderCallback;
 
 /*!
  @typedef EDAssemblySyntax_t
@@ -71,31 +69,31 @@ enum {
   kEDAssemblySyntaxX86ATT    = 1,
   kEDAssemblySyntaxARMUAL    = 2
 };
-typedef unsigned EDAssemblySyntax_t;
+alias uint EDAssemblySyntax_t;
 
 /*!
  @typedef EDDisassemblerRef
  Encapsulates a disassembler for a single CPU architecture.
  */
-typedef void *EDDisassemblerRef;
+alias void *EDDisassemblerRef;
 
 /*!
  @typedef EDInstRef
  Encapsulates a single disassembled instruction in one assembly syntax.
  */
-typedef void *EDInstRef;
+alias void *EDInstRef;
 
 /*!
  @typedef EDTokenRef
  Encapsulates a token from the disassembly of an instruction.
  */
-typedef void *EDTokenRef;
+alias void *EDTokenRef;
 
 /*!
  @typedef EDOperandRef
  Encapsulates an operand of an instruction.
  */
-typedef void *EDOperandRef;
+alias void *EDOperandRef;
 
 /*!
  @functiongroup Getting a disassembler
@@ -111,7 +109,7 @@ typedef void *EDOperandRef;
  @result 0 on success; -1 otherwise.
  */
 int EDGetDisassembler(EDDisassemblerRef *disassembler,
-                      const char *triple,
+                      const(char) *triple,
                       EDAssemblySyntax_t syntax);
 
 /*!
@@ -127,9 +125,9 @@ int EDGetDisassembler(EDDisassemblerRef *disassembler,
  @param regID The register identifier, as returned by EDRegisterTokenValue.
  @result 0 on success; -1 otherwise.
  */
-int EDGetRegisterName(const char** regName,
+int EDGetRegisterName(const(char)** regName,
                       EDDisassemblerRef disassembler,
-                      unsigned regID);
+                      uint regID);
 
 /*!
  @function EDRegisterIsStackPointer
@@ -139,7 +137,7 @@ int EDGetRegisterName(const char** regName,
  @result 1 if true; 0 otherwise.
  */
 int EDRegisterIsStackPointer(EDDisassemblerRef disassembler,
-                             unsigned regID);
+                             uint regID);
 
 /*!
  @function EDRegisterIsProgramCounter
@@ -149,7 +147,7 @@ int EDRegisterIsStackPointer(EDDisassemblerRef disassembler,
  @result 1 if true; 0 otherwise.
  */
 int EDRegisterIsProgramCounter(EDDisassemblerRef disassembler,
-                               unsigned regID);
+                               uint regID);
 
 /*!
  @functiongroup Creating and querying instructions
@@ -169,8 +167,8 @@ int EDRegisterIsProgramCounter(EDDisassemblerRef disassembler,
  @param arg An anonymous argument to be passed to byteReader.
  @result The number of instructions read on success; 0 otherwise.
  */
-unsigned int EDCreateInsts(EDInstRef *insts,
-                           unsigned int count,
+uint EDCreateInsts(EDInstRef *insts,
+                           uint count,
                            EDDisassemblerRef disassembler,
                            EDByteReaderCallback byteReader,
                            uint64_t address,
@@ -199,7 +197,7 @@ int EDInstByteSize(EDInstRef inst);
  @param inst The instruction to be queried.
  @result 0 on success; -1 otherwise.
  */
-int EDGetInstString(const char **buf,
+int EDGetInstString(const(char) **buf,
                     EDInstRef inst);
 
 /*!
@@ -209,7 +207,7 @@ int EDGetInstString(const char **buf,
  @param inst The instruction to be queried.
  @result 0 on success; -1 otherwise.
  */
-int EDInstID(unsigned *instID, EDInstRef inst);
+int EDInstID(uint *instID, EDInstRef inst);
 
 /*!
  @function EDInstIsBranch
@@ -283,7 +281,7 @@ int EDGetToken(EDTokenRef *token,
  @param token The token to be queried.
  @result 0 on success; -1 otherwise.
  */
-int EDGetTokenString(const char **buf,
+int EDGetTokenString(const(char) **buf,
                      EDTokenRef token);
 
 /*!
@@ -353,7 +351,7 @@ int EDLiteralTokenAbsoluteValue(uint64_t *value,
  @param token The token to be queried.
  @result 0 on success; -1 otherwise.
  */
-int EDRegisterTokenValue(unsigned *registerID,
+int EDRegisterTokenValue(uint *registerID,
                          EDTokenRef token);
 
 /*!
@@ -408,7 +406,7 @@ int EDOperandIsMemory(EDOperandRef operand);
  @param operand The operand to be queried.
  @result 0 on success; -1 otherwise.
  */
-int EDRegisterOperandValue(unsigned *value,
+int EDRegisterOperandValue(uint *value,
                            EDOperandRef operand);
 
 /*!
@@ -441,7 +439,8 @@ int EDEvaluateOperand(uint64_t *result,
                       EDRegisterReaderCallback regReader,
                       void *arg);
 
-#ifdef __BLOCKS__
+version(__BLOCKS__)
+{
 
 /*!
  @typedef EDByteBlock_t
@@ -450,7 +449,7 @@ int EDEvaluateOperand(uint64_t *result,
  @param address The address of the byte to be read.
  @result 0 on success; -1 otherwise.
  */
-typedef int (^EDByteBlock_t)(uint8_t *byte, uint64_t address);
+alias int function(uint8_t *byte_, uint64_t address) EDByteBlock_t;
 
 /*!
  @typedef EDRegisterBlock_t
@@ -460,7 +459,7 @@ typedef int (^EDByteBlock_t)(uint8_t *byte, uint64_t address);
  @param regID The LLVM register identifier for the register to read.
  @result 0 if the register could be read; -1 otherwise.
  */
-typedef int (^EDRegisterBlock_t)(uint64_t *value, unsigned regID);
+alias int function(uint64_t *value, uint regID) EDRegisterBlock_t;
 
 /*!
  @typedef EDTokenVisitor_t
@@ -468,7 +467,7 @@ typedef int (^EDRegisterBlock_t)(uint64_t *value, unsigned regID);
  @param token The current token being read.
  @result 0 to continue; 1 to stop normally; -1 on error.
  */
-typedef int (^EDTokenVisitor_t)(EDTokenRef token);
+alias int function(EDTokenRef token) EDTokenVisitor_t;
 
 /*! @functiongroup Block-based interfaces */
 
@@ -486,7 +485,7 @@ typedef int (^EDTokenVisitor_t)(EDTokenRef token);
  @param address The address of the first byte of the instruction.
  @result The number of instructions read on success; 0 otherwise.
  */
-unsigned int EDBlockCreateInsts(EDInstRef *insts,
+uint EDBlockCreateInsts(EDInstRef *insts,
                                 int count,
                                 EDDisassemblerRef disassembler,
                                 EDByteBlock_t byteBlock,
@@ -521,10 +520,4 @@ int EDBlockVisitTokens(EDInstRef inst,
  * @}
  */
 
-#endif
-
-#ifdef __cplusplus
 }
-#endif
-
-#endif

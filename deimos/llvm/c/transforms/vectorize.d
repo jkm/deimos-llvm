@@ -17,14 +17,11 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_TRANSFORMS_VECTORIZE_H
-#define LLVM_C_TRANSFORMS_VECTORIZE_H
+module deimos.llvm.c.transforms.vectorize;
 
-#include "llvm-c/Core.h"
+import deimos.llvm.c.core;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern(C) nothrow:
 
 /**
  * @defgroup LLVMCTransformsVectorize Vectorization transformations
@@ -39,10 +36,3 @@ void LLVMAddBBVectorizePass(LLVMPassManagerRef PM);
 /**
  * @}
  */
-
-#ifdef __cplusplus
-}
-#endif /* defined(__cplusplus) */
-
-#endif
-

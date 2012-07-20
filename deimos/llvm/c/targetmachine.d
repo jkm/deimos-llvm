@@ -16,44 +16,45 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_TARGETMACHINE_H
-#define LLVM_C_TARGETMACHINE_H
+module deimos.llvm.c.targetmachine;
 
-#include "llvm-c/Core.h"
+import deimos.llvm.c.core;
+import deimos.llvm.c.target : LLVMTargetDataRef;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-typedef struct LLVMTargetMachine *LLVMTargetMachineRef;
-typedef struct LLVMTarget *LLVMTargetRef;
+extern(C) nothrow:
 
-typedef enum {
+struct __LLVMTargetMachine {};
+alias __LLVMTargetMachine *LLVMTargetMachineRef;
+struct __LLVMTarget {};
+alias __LLVMTarget *LLVMTargetRef;
+
+enum LLVMCodeGenOptLevel {
     LLVMCodeGenLevelNone,
     LLVMCodeGenLevelLess,
     LLVMCodeGenLevelDefault,
     LLVMCodeGenLevelAggressive
-} LLVMCodeGenOptLevel;
+}
 
-typedef enum {
+enum LLVMRelocMode {
     LLVMRelocDefault,
     LLVMRelocStatic,
     LLVMRelocPIC,
     LLVMRelocDynamicNoPic
-} LLVMRelocMode;
+}
 
-typedef enum {
+enum LLVMCodeModel {
     LLVMCodeModelDefault,
     LLVMCodeModelJITDefault,
     LLVMCodeModelSmall,
     LLVMCodeModelKernel,
     LLVMCodeModelMedium,
     LLVMCodeModelLarge
-} LLVMCodeModel;
+}
 
-typedef enum {
+enum LLVMCodeGenFileType {
     LLVMAssemblyFile,
     LLVMObjectFile
-} LLVMCodeGenFileType;
+}
 
 /** Returns the first llvm::Target in the registered targets list. */
 LLVMTargetRef LLVMGetFirstTarget();
@@ -62,10 +63,10 @@ LLVMTargetRef LLVMGetNextTarget(LLVMTargetRef T);
 
 /*===-- Target ------------------------------------------------------------===*/
 /** Returns the name of a target. See llvm::Target::getName */
-const char *LLVMGetTargetName(LLVMTargetRef T);
+const(char) *LLVMGetTargetName(LLVMTargetRef T);
 
 /** Returns the description  of a target. See llvm::Target::getDescription */
-const char *LLVMGetTargetDescription(LLVMTargetRef T);
+const(char) *LLVMGetTargetDescription(LLVMTargetRef T);
 
 /** Returns if the target has a JIT */
 LLVMBool LLVMTargetHasJIT(LLVMTargetRef T);
@@ -112,31 +113,3 @@ LLVMTargetDataRef LLVMGetTargetMachineData(LLVMTargetMachineRef T);
   error in ErrorMessage. Use LLVMDisposeMessage to dispose the message. */
 LLVMBool LLVMTargetMachineEmitToFile(LLVMTargetMachineRef T, LLVMModuleRef M,
   char *Filename, LLVMCodeGenFileType codegen, char **ErrorMessage);
-
-
-
-
-#ifdef __cplusplus
-}
-
-namespace llvm {
-  class TargetMachine;
-  class Target;
-
-  inline TargetMachine *unwrap(LLVMTargetMachineRef P) {
-    return reinterpret_cast<TargetMachine*>(P);
-  }
-  inline Target *unwrap(LLVMTargetRef P) {
-    return reinterpret_cast<Target*>(P);
-  }
-  inline LLVMTargetMachineRef wrap(const TargetMachine *P) {
-    return reinterpret_cast<LLVMTargetMachineRef>(
-      const_cast<TargetMachine*>(P));
-  }
-  inline LLVMTargetRef wrap(const Target * P) {
-    return reinterpret_cast<LLVMTargetRef>(const_cast<Target*>(P));
-  }
-}
-#endif
-
-#endif
