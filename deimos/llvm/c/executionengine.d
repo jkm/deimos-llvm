@@ -16,7 +16,7 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-module deimos.llvm.c.enhanceddisassembly;
+module deimos.llvm.c.executionengine;
 
 import deimos.llvm.c.core;
 import deimos.llvm.c.target;
