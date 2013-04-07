@@ -29,7 +29,8 @@ extern(C) nothrow:
 
 enum LTO_API_VERSION = 4;
 
-enum lto_symbol_attributes {
+alias int lto_symbol_attributes;
+enum : lto_symbol_attributes {
     LTO_SYMBOL_ALIGNMENT_MASK              = 0x0000001F, /* log2 of alignment */
     LTO_SYMBOL_PERMISSIONS_MASK            = 0x000000E0,
     LTO_SYMBOL_PERMISSIONS_CODE            = 0x000000A0,
@@ -49,12 +50,14 @@ enum lto_symbol_attributes {
     LTO_SYMBOL_SCOPE_DEFAULT_CAN_BE_HIDDEN = 0x00002800
 }
 
-enum lto_debug_model {
+alias int lto_debug_model;
+enum : lto_debug_model {
     LTO_DEBUG_MODEL_NONE         = 0,
     LTO_DEBUG_MODEL_DWARF        = 1
 }
 
-enum lto_codegen_model {
+alias int lto_codegen_model;
+enum : lto_codegen_model {
     LTO_CODEGEN_PIC_MODEL_STATIC         = 0,
     LTO_CODEGEN_PIC_MODEL_DYNAMIC        = 1,
     LTO_CODEGEN_PIC_MODEL_DYNAMIC_NO_PIC = 2

@@ -146,7 +146,8 @@ alias __LLVMOpaquePassRegistry *LLVMPassRegistryRef;
 struct __LLVMOpaqueUse {};
 alias __LLVMOpaqueUse *LLVMUseRef;
 
-enum LLVMAttribute {
+alias int LLVMAttribute;
+enum : LLVMAttribute {
     LLVMZExtAttribute       = 1<<0,
     LLVMSExtAttribute       = 1<<1,
     LLVMNoReturnAttribute   = 1<<2,
@@ -180,7 +181,8 @@ enum LLVMAttribute {
     //LLVMAddressSafety = 1ULL << 32
 }
 
-enum LLVMOpcode {
+alias int LLVMOpcode;
+enum : LLVMOpcode {
   /* Terminator Instructions */
   LLVMRet            = 1,
   LLVMBr             = 2,
@@ -258,7 +260,8 @@ enum LLVMOpcode {
 
 }
 
-enum LLVMTypeKind {
+alias int LLVMTypeKind;
+enum : LLVMTypeKind {
   LLVMVoidTypeKind,        /**< type with no size */
   LLVMHalfTypeKind,        /**< 16 bit floating point type */
   LLVMFloatTypeKind,       /**< 32 bit floating point type */
@@ -277,7 +280,8 @@ enum LLVMTypeKind {
   LLVMX86_MMXTypeKind      /**< X86 MMX */
 }
 
-enum LLVMLinkage {
+alias int LLVMLinkage;
+enum : LLVMLinkage {
   LLVMExternalLinkage,    /**< Externally visible function */
   LLVMAvailableExternallyLinkage,
   LLVMLinkOnceAnyLinkage, /**< Keep one copy of function when linking (inline)*/
@@ -301,13 +305,15 @@ enum LLVMLinkage {
                                            hidden. */
 }
 
-enum LLVMVisibility {
+alias int LLVMVisibility;
+enum : LLVMVisibility {
   LLVMDefaultVisibility,  /**< The GV is visible */
   LLVMHiddenVisibility,   /**< The GV is hidden */
   LLVMProtectedVisibility /**< The GV is protected */
 }
 
-enum LLVMCallConv {
+alias int LLVMCallConv;
+enum : LLVMCallConv {
   LLVMCCallConv           = 0,
   LLVMFastCallConv        = 8,
   LLVMColdCallConv        = 9,
@@ -315,7 +321,8 @@ enum LLVMCallConv {
   LLVMX86FastcallCallConv = 65
 }
 
-enum LLVMIntPredicate {
+alias int LLVMIntPredicate;
+enum : LLVMIntPredicate {
   LLVMIntEQ = 32, /**< equal */
   LLVMIntNE,      /**< not equal */
   LLVMIntUGT,     /**< unsigned greater than */
@@ -328,7 +335,8 @@ enum LLVMIntPredicate {
   LLVMIntSLE      /**< signed less or equal */
 }
 
-enum LLVMRealPredicate {
+alias int LLVMRealPredicate;
+enum : LLVMRealPredicate {
   LLVMRealPredicateFalse, /**< Always false (always folded) */
   LLVMRealOEQ,            /**< True if ordered and equal */
   LLVMRealOGT,            /**< True if ordered and greater than */
@@ -347,7 +355,8 @@ enum LLVMRealPredicate {
   LLVMRealPredicateTrue   /**< Always true (always folded) */
 }
 
-enum LLVMLandingPadClauseTy {
+alias int LLVMLandingPadClauseTy;
+enum : LLVMLandingPadClauseTy {
   LLVMLandingPadCatch,    /**< A catch clause   */
   LLVMLandingPadFilter    /**< A filter clause  */
 }

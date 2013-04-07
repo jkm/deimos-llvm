@@ -29,7 +29,8 @@ extern(C) nothrow:
  * @{
  */
 
-enum LLVMVerifierFailureAction {
+alias int LLVMVerifierFailureAction;
+enum : LLVMVerifierFailureAction {
   LLVMAbortProcessAction, /* verifier will print to stderr and abort() */
   LLVMPrintMessageAction, /* verifier will print to stderr and return 1 */
   LLVMReturnStatusAction  /* verifier will just return 1 */

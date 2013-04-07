@@ -28,21 +28,24 @@ alias __LLVMTargetMachine *LLVMTargetMachineRef;
 struct __LLVMTarget {};
 alias __LLVMTarget *LLVMTargetRef;
 
-enum LLVMCodeGenOptLevel {
+alias int LLVMCodeGenOptLevel;
+enum : LLVMCodeGenOptLevel {
     LLVMCodeGenLevelNone,
     LLVMCodeGenLevelLess,
     LLVMCodeGenLevelDefault,
     LLVMCodeGenLevelAggressive
 }
 
-enum LLVMRelocMode {
+alias int LLVMRelocMode;
+enum : LLVMRelocMode {
     LLVMRelocDefault,
     LLVMRelocStatic,
     LLVMRelocPIC,
     LLVMRelocDynamicNoPic
 }
 
-enum LLVMCodeModel {
+alias int LLVMCodeModel;
+enum : LLVMCodeModel {
     LLVMCodeModelDefault,
     LLVMCodeModelJITDefault,
     LLVMCodeModelSmall,
@@ -51,7 +54,8 @@ enum LLVMCodeModel {
     LLVMCodeModelLarge
 }
 
-enum LLVMCodeGenFileType {
+alias int LLVMCodeGenFileType;
+enum : LLVMCodeGenFileType {
     LLVMAssemblyFile,
     LLVMObjectFile
 }

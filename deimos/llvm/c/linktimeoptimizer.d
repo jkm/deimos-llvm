@@ -31,7 +31,8 @@ extern(C) nothrow:
 
   /// This provides a C-visible enumerator to manage status codes.
   /// This should map exactly onto the C++ enumerator LTOStatus.
-  enum llvm_lto_status {
+  alias int llvm_lto_status;
+  enum : llvm_lto_status {
     LLVM_LTO_UNKNOWN,
     LLVM_LTO_OPT_SUCCESS,
     LLVM_LTO_READ_SUCCESS,
