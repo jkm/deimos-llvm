@@ -19,6 +19,35 @@
 module deimos.llvm.c.target;
 
 import deimos.llvm.c.core;
+import deimos.llvm.config.llvm_config;
+
+private
+{
+  import std.algorithm : find, startsWith, countUntil;
+  import std.conv;
+  import std.array;
+
+  string llvmDefFile(string llvmDefFileContent, string type)
+  {
+    string[] targets;
+    auto targetDefinitions = llvmDefFileContent.find("#endif");
+    auto str = "LLVM_" ~ type ~ "(";
+
+    while (!targetDefinitions.empty)
+    {
+      if (targetDefinitions.startsWith(str))
+      {
+        targetDefinitions = targetDefinitions[str.length .. $];
+        auto target = targetDefinitions[0 .. targetDefinitions.countUntil(")")];
+        targetDefinitions = targetDefinitions[target.length + 1 .. $];
+        targets ~= target;
+      }
+      else targetDefinitions.popFront();
+    }
+
+    return targets.to!string();
+  }
+}
 
 extern(C) nothrow:
 
@@ -38,23 +67,13 @@ alias __LLVMOpaqueTargetLibraryInfotData *LLVMTargetLibraryInfoRef;
 struct __LLVMStructLayout {};
 alias __LLVMStructLayout *LLVMStructLayoutRef;
 
-extern(D) string LLVM_TARGET(string delegate(string) nothrow fun)
+private extern(D) string LLVM_TARGET(string delegate(string) nothrow fun)
 {
   string ret;
-  foreach (str; [
-                  "ARM",
-                  "CellSPU",
-                  "CppBackend",
-                  "Hexagon",
-                  "Mips",
-                  "MBlaze",
-                  "MSP430",
-                  "PowerPC",
-                  "PTX",
-                  "Sparc",
-                  "X86",
-                  "XCore",
-                ])
+  string[] targets;
+  version(llvmNoConfig) {}
+  else targets = mixin(llvmDefFile(import("Targets.def"), "TARGET"));
+  foreach (str; targets)
   {
     ret ~= fun(str) ~ "\n";
   }
@@ -75,22 +94,13 @@ extern(D) mixin(LLVM_TARGET(delegate string(string name) {
 }));
 
 
-extern(D) string LLVM_ASM_PRINTER(string delegate(string) nothrow fun)
+private extern(D) string LLVM_ASM_PRINTER(string delegate(string) nothrow fun)
 {
   string ret;
-  foreach (str; [
-                  "ARM",
-                  "CellSPU",
-                  "Hexagon",
-                  "Mips",
-                  "MBlaze",
-                  "MSP430",
-                  "PowerPC",
-                  "PTX",
-                  "Sparc",
-                  "X86",
-                  "XCore",
-                ])
+  string[] targets;
+  version(llvmNoConfig) {}
+  else targets = mixin(llvmDefFile(import("AsmPrinters.def"), "ASM_PRINTER"));
+  foreach (str; targets)
   {
     ret ~= fun(str) ~ "\n";
   }
@@ -102,15 +112,13 @@ extern(D) mixin(LLVM_ASM_PRINTER(delegate string(string name) {
   return "extern(C) void LLVMInitialize" ~ name ~ "AsmPrinter();";
 }));
 
-extern(D) string LLVM_ASM_PARSER(string delegate(string) nothrow fun)
+private extern(D) string LLVM_ASM_PARSER(string delegate(string) nothrow fun)
 {
   string ret;
-  foreach (str; [
-                  "ARM",
-                  "Mips",
-                  "MBlaze",
-                  "X86",
-                ])
+  string[] targets;
+  version(llvmNoConfig) {}
+  else targets = mixin(llvmDefFile(import("AsmParsers.def"), "ASM_PARSER"));
+  foreach (str; targets)
   {
     ret ~= fun(str) ~ "\n";
   }
@@ -122,15 +130,13 @@ extern(D) mixin(LLVM_ASM_PARSER(delegate string(string name) {
   return "extern(C) void LLVMInitialize" ~ name ~ "AsmParser();";
 }));
 
-extern(D) string LLVM_ASM_DISASSEMBLER(string delegate(string) nothrow fun)
+private extern(D) string LLVM_ASM_DISASSEMBLER(string delegate(string) nothrow fun)
 {
   string ret;
-  foreach (str; [
-                  "ARM",
-                  "Mips",
-                  "MBlaze",
-                  "X86",
-                ])
+  string[] targets;
+  version(llvmNoConfig) {}
+  else targets = mixin(llvmDefFile(import("Dissassembler.def"), "DISASSEMBLER"));
+  foreach (str; targets)
   {
     ret ~= fun(str) ~ "\n";
   }

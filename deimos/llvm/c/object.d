@@ -20,6 +20,7 @@ module deimos.llvm.c.object;
 
 import core.stdc.stdint : uint64_t;
 import deimos.llvm.c.core;
+import deimos.llvm.config.llvm_config;
 
 extern(C) nothrow:
 
