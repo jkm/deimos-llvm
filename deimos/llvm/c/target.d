@@ -144,7 +144,7 @@ private extern(D) string LLVM_ASM_DISASSEMBLER(string delegate(string) nothrow f
 }
 
 /* Declare all of the available disassembler initialization functions. */
-extern(D) mixin(LLVM_ASM_PARSER(delegate string(string name) {
+extern(D) mixin(LLVM_ASM_DISASSEMBLER(delegate string(string name) {
   return "extern(C) void LLVMInitialize" ~ name ~ "Disassembler();";
 }));
 
