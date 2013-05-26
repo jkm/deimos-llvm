@@ -21,7 +21,6 @@ private
 {
   import std.string : splitLines;
   import std.algorithm : startsWith, countUntil, filter;
-  import deimos.llvm.c.target;
 
   string llvmConfig()
   {
@@ -39,8 +38,10 @@ private
       switch (identifier)
       {
         default:
-          code ~= "enum " ~ identifier ~ " = " ~
-                  (d.startsWith("LLVMInitialize") ? "&" : "") ~ d ~ ";\n";
+          if (d.startsWith("LLVMInitialize"))
+             code ~= "alias " ~ identifier ~ " = " ~ d ~ ";\n";
+          else
+             code ~= "enum " ~ identifier ~ " = " ~ d ~ ";\n";
           break;
         case "LLVM_NATIVE_ARCH":
           code ~= "enum " ~ identifier ~ " = \"" ~ d ~ "\";\n";
@@ -58,5 +59,6 @@ private
   }
 }
 
+import deimos.llvm.c.target;
 extern(C) nothrow:
 mixin(llvmConfig());

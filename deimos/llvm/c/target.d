@@ -19,7 +19,6 @@
 module deimos.llvm.c.target;
 
 import deimos.llvm.c.core;
-import deimos.llvm.config.llvm_config;
 
 private
 {
@@ -92,7 +91,6 @@ extern(D) mixin(LLVM_TARGET(delegate string(string name) {
 extern(D) mixin(LLVM_TARGET(delegate string(string name) {
   return "extern(C) void LLVMInitialize" ~ name ~ "TargetMC();";
 }));
-
 
 private extern(D) string LLVM_ASM_PRINTER(string delegate(string) nothrow fun)
 {
