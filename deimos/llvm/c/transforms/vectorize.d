@@ -33,6 +33,9 @@ extern(C) nothrow:
 /** See llvm::createBBVectorizePass function. */
 void LLVMAddBBVectorizePass(LLVMPassManagerRef PM);
 
+/** See llvm::createLoopVectorizePass function. */
+void LLVMAddLoopVectorizePass(LLVMPassManagerRef PM);
+
 /**
  * @}
  */
