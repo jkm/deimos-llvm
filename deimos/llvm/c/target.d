@@ -135,7 +135,7 @@ private extern(D) string LLVM_ASM_DISASSEMBLER(string delegate(string) nothrow f
   string ret;
   string[] targets;
   version(llvmNoConfig) {}
-  else targets = mixin(llvmDefFile(import("Dissassembler.def"), "DISASSEMBLER"));
+  else targets = mixin(llvmDefFile(import("Disassemblers.def"), "DISASSEMBLER"));
   foreach (str; targets)
   {
     ret ~= fun(str) ~ "\n";
@@ -171,7 +171,7 @@ static void LLVMInitializeAllTargets() {
     support. */
 static void LLVMInitializeAllTargetMCs() {
   mixin(LLVM_TARGET(delegate string(string name) {
-    return "LLVMInitialize" ~ name ~ "TargetMV();";
+    return "LLVMInitialize" ~ name ~ "TargetMC();";
   }));
 }
   
