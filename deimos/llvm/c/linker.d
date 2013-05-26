@@ -11,20 +11,15 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
-#ifndef LLVM_C_LINKER_H
-#define LLVM_C_LINKER_H
+import deimos.llvm.c.core;
 
-#include "llvm-c/Core.h"
+extern(C) nothrow:
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-typedef enum {
+alias int LLVMLinkerMode;
+enum : LLVMLinkerMode {
   LLVMLinkerDestroySource = 0, /* Allow source module to be destroyed. */
   LLVMLinkerPreserveSource = 1 /* Preserve the source module. */
-} LLVMLinkerMode;
+}
 
 
 /* Links the source module into the destination module, taking ownership
@@ -34,9 +29,3 @@ typedef enum {
  * is true if an error occurred, false otherwise. */
 LLVMBool LLVMLinkModules(LLVMModuleRef Dest, LLVMModuleRef Src,
                          LLVMLinkerMode Mode, char **OutMessage);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
