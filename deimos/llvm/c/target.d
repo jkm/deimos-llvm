@@ -205,7 +205,18 @@ static void LLVMInitializeAllDisassemblers() {
     for JIT applications to ensure that the target gets linked in correctly. */
 static LLVMBool LLVMInitializeNativeTarget() {
   /* If we have a native target, initialize it to ensure it is linked in. */
-  return 1;
+  version(llvmNoConfig)
+  {
+    return 1;
+  }
+  else
+  {
+    import deimos.llvm.config.llvm_config;
+    LLVM_NATIVE_TARGETINFO();
+    LLVM_NATIVE_TARGET();
+    LLVM_NATIVE_TARGETMC();
+    return 0;
+  }
 }  
 
 /*===-- Target Data -------------------------------------------------------===*/
