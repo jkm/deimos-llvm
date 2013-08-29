@@ -50,11 +50,6 @@ extern(C) nothrow:
  * with C++ due to name mangling. So in addition to C, this interface enables
  * tools written in such languages.
  *
- * When included into a C++ source file, also declares 'wrap' and 'unwrap'
- * helpers to perform opaque reference<-->pointer conversions. These helpers
- * are shorter and more tightly typed than writing the casts by hand when
- * authoring bindings. In assert builds, they will do runtime type checking.
- *
  * @{
  */
 
@@ -175,10 +170,11 @@ enum : LLVMAttribute {
     LLVMUWTable = 1 << 30,
     LLVMNonLazyBind = 1 << 31
 
-    /* FIXME: This attribute is currently not included in the C API as
+    /* FIXME: These attributes are currently not included in the C API as
        a temporary measure until the API/ABI impact to the C API is understood
        and the path forward agreed upon.
-    LLVMAddressSafety = 1ULL << 32
+    LLVMAddressSafety = 1ULL << 32,
+    LLVMStackProtectStrongAttribute = 1ULL<<33
     */
 }
 
@@ -361,11 +357,76 @@ enum : LLVMLandingPadClauseTy {
   LLVMLandingPadFilter    /**< A filter clause  */
 }
 
+alias int LLVMThreadLocalMode;
+enum : LLVMThreadLocalMode {
+  LLVMNotThreadLocal = 0,
+  LLVMGeneralDynamicTLSModel,
+  LLVMLocalDynamicTLSModel,
+  LLVMInitialExecTLSModel,
+  LLVMLocalExecTLSModel
+}
+
+alias int LLVMAtomicOrdering;
+enum : LLVMAtomicOrdering {
+  LLVMAtomicOrderingNotAtomic = 0, /**< A load or store which is not atomic */
+  LLVMAtomicOrderingUnordered = 1, /**< Lowest level of atomicity, guarantees
+                                     somewhat sane results, lock free. */
+  LLVMAtomicOrderingMonotonic = 2, /**< guarantees that if you take all the 
+                                     operations affecting a specific address, 
+                                     a consistent ordering exists */
+  LLVMAtomicOrderingAcquire = 4, /**< Acquire provides a barrier of the sort 
+                                   necessary to acquire a lock to access other 
+                                   memory with normal loads and stores. */
+  LLVMAtomicOrderingRelease = 5, /**< Release is similar to Acquire, but with 
+                                   a barrier of the sort necessary to release 
+                                   a lock. */
+  LLVMAtomicOrderingAcquireRelease = 6, /**< provides both an Acquire and a 
+                                          Release barrier (for fences and 
+                                          operations which both read and write
+                                           memory). */
+  LLVMAtomicOrderingSequentiallyConsistent = 7 /**< provides Acquire semantics 
+                                                 for loads and Release 
+                                                 semantics for stores. 
+                                                 Additionally, it guarantees 
+                                                 that a total ordering exists 
+                                                 between all 
+                                                 SequentiallyConsistent 
+                                                 operations. */
+}
+
+alias int LLVMAtomicRMWBinOp;
+enum : LLVMAtomicRMWBinOp {
+    LLVMAtomicRMWBinOpXchg, /**< Set the new value and return the one old */
+    LLVMAtomicRMWBinOpAdd, /**< Add a value and return the old one */
+    LLVMAtomicRMWBinOpSub, /**< Subtract a value and return the old one */
+    LLVMAtomicRMWBinOpAnd, /**< And a value and return the old one */
+    LLVMAtomicRMWBinOpNand, /**< Not-And a value and return the old one */
+    LLVMAtomicRMWBinOpOr, /**< OR a value and return the old one */
+    LLVMAtomicRMWBinOpXor, /**< Xor a value and return the old one */
+    LLVMAtomicRMWBinOpMax, /**< Sets the value if it's greater than the
+                             original using a signed comparison and return 
+                             the old one */
+    LLVMAtomicRMWBinOpMin, /**< Sets the value if it's Smaller than the
+                             original using a signed comparison and return 
+                             the old one */
+    LLVMAtomicRMWBinOpUMax, /**< Sets the value if it's greater than the
+                             original using an unsigned comparison and return 
+                             the old one */
+    LLVMAtomicRMWBinOpUMin /**< Sets the value if it's greater than the
+                             original using an unsigned comparison  and return 
+                             the old one */
+}
+
 /**
  * @}
  */
 
 void LLVMInitializeCore(LLVMPassRegistryRef R);
+
+/** Deallocate and destroy all ManagedStatic variables.
+    @see llvm::llvm_shutdown
+    @see ManagedStatic */
+void LLVMShutdown();
 
 
 /*===-- Error handling ----------------------------------------------------===*/
@@ -1619,6 +1680,10 @@ LLVMBool LLVMIsThreadLocal(LLVMValueRef GlobalVar);
 void LLVMSetThreadLocal(LLVMValueRef GlobalVar, LLVMBool IsThreadLocal);
 LLVMBool LLVMIsGlobalConstant(LLVMValueRef GlobalVar);
 void LLVMSetGlobalConstant(LLVMValueRef GlobalVar, LLVMBool IsConstant);
+LLVMThreadLocalMode LLVMGetThreadLocalMode(LLVMValueRef GlobalVar);
+void LLVMSetThreadLocalMode(LLVMValueRef GlobalVar, LLVMThreadLocalMode Mode);
+LLVMBool LLVMIsExternallyInitialized(LLVMValueRef GlobalVar);
+void LLVMSetExternallyInitialized(LLVMValueRef GlobalVar, LLVMBool IsExtInit);
 
 /**
  * @}
@@ -1705,6 +1770,13 @@ void LLVMSetGC(LLVMValueRef Fn, const(char) *Name);
  * @see llvm::Function::addAttribute()
  */
 void LLVMAddFunctionAttr(LLVMValueRef Fn, LLVMAttribute PA);
+
+/**
+ * Add a target-dependent attribute to a fuction
+ * @see llvm::AttrBuilder::addAttribute()
+ */
+void LLVMAddTargetDependentFunctionAttr(LLVMValueRef Fn, const(char) *A,
+                                        const(char) *V);
 
 /**
  * Obtain an attribute from a function.
@@ -2528,6 +2600,10 @@ LLVMValueRef LLVMBuildIsNotNull(LLVMBuilderRef, LLVMValueRef Val,
                                 const(char) *Name);
 LLVMValueRef LLVMBuildPtrDiff(LLVMBuilderRef, LLVMValueRef LHS,
                               LLVMValueRef RHS, const(char) *Name);
+LLVMValueRef LLVMBuildAtomicRMW(LLVMBuilderRef B,LLVMAtomicRMWBinOp op,  
+                                LLVMValueRef PTR, LLVMValueRef Val, 
+                                LLVMAtomicOrdering ordering, 
+                                LLVMBool singleThread);
 
 /**
  * @}
@@ -2566,6 +2642,15 @@ LLVMBool LLVMCreateMemoryBufferWithContentsOfFile(const(char) *Path,
                                                   char **OutMessage);
 LLVMBool LLVMCreateMemoryBufferWithSTDIN(LLVMMemoryBufferRef *OutMemBuf,
                                          char **OutMessage);
+LLVMMemoryBufferRef LLVMCreateMemoryBufferWithMemoryRange(const(char) *InputData,
+                                                          size_t InputDataLength,
+                                                          const(char) *BufferName,
+                                                          LLVMBool RequiresNullTerminator);
+LLVMMemoryBufferRef LLVMCreateMemoryBufferWithMemoryRangeCopy(const(char) *InputData,
+                                                              size_t InputDataLength,
+                                                              const(char) *BufferName);
+const(char) *LLVMGetBufferStart(LLVMMemoryBufferRef MemBuf);
+size_t LLVMGetBufferSize(LLVMMemoryBufferRef MemBuf);
 void LLVMDisposeMemoryBuffer(LLVMMemoryBufferRef MemBuf);
 
 /**
@@ -2632,6 +2717,34 @@ LLVMBool LLVMFinalizeFunctionPassManager(LLVMPassManagerRef FPM);
     the module provider.
     @see llvm::PassManagerBase::~PassManagerBase. */
 void LLVMDisposePassManager(LLVMPassManagerRef PM);
+
+/**
+ * @}
+ */
+
+/**
+ * @defgroup LLVMCCoreThreading Threading
+ *
+ * Handle the structures needed to make LLVM safe for multithreading.
+ *
+ * @{
+ */
+
+/** Allocate and initialize structures needed to make LLVM safe for
+    multithreading. The return value indicates whether multithreaded
+    initialization succeeded. Must be executed in isolation from all
+    other LLVM api calls.
+    @see llvm::llvm_start_multithreaded */
+LLVMBool LLVMStartMultithreaded();
+
+/** Deallocate structures necessary to make LLVM safe for multithreading.
+    Must be executed in isolation from all other LLVM api calls.
+    @see llvm::llvm_stop_multithreaded */
+void LLVMStopMultithreaded();
+
+/** Check whether LLVM is executing in thread-safe mode or not.
+    @see llvm::llvm_is_multithreaded */
+LLVMBool LLVMIsMultithreaded();
 
 /**
  * @}

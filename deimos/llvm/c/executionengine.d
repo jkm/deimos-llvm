@@ -20,6 +20,7 @@ module deimos.llvm.c.executionengine;
 
 import deimos.llvm.c.core;
 import deimos.llvm.c.target;
+import deimos.llvm.c.targetmachine;
 
 extern(C) nothrow:
 
@@ -31,12 +32,20 @@ extern(C) nothrow:
  */
 
 void LLVMLinkInJIT();
+void LLVMLinkInMCJIT();
 void LLVMLinkInInterpreter();
 
 struct __LLVMOpaqueGenericValue {};
 alias __LLVMOpaqueGenericValue *LLVMGenericValueRef;
 struct __LLVMOpaqueExecutionEngine {};
 alias __LLVMOpaqueExecutionEngine *LLVMExecutionEngineRef;
+
+struct LLVMMCJITCompilerOptions {
+  uint OptLevel;
+  LLVMCodeModel CodeModel;
+  LLVMBool NoFramePointerElim;
+  LLVMBool EnableFastISel;
+}
 
 /*===-- Operations on generic values --------------------------------------===*/
 
@@ -73,6 +82,31 @@ LLVMBool LLVMCreateJITCompilerForModule(LLVMExecutionEngineRef *OutJIT,
                                         LLVMModuleRef M,
                                         uint OptLevel,
                                         char **OutError);
+
+void LLVMInitializeMCJITCompilerOptions(
+  LLVMMCJITCompilerOptions *Options, size_t SizeOfOptions);
+
+/**
+ * Create an MCJIT execution engine for a module, with the given options. It is
+ * the responsibility of the caller to ensure that all fields in Options up to
+ * the given SizeOfOptions are initialized. It is correct to pass a smaller
+ * value of SizeOfOptions that omits some fields. The canonical way of using
+ * this is:
+ *
+ * LLVMMCJITCompilerOptions options;
+ * LLVMInitializeMCJITCompilerOptions(&options, sizeof(options));
+ * ... fill in those options you care about
+ * LLVMCreateMCJITCompilerForModule(&jit, mod, &options, sizeof(options),
+ *                                  &error);
+ *
+ * Note that this is also correct, though possibly suboptimal:
+ *
+ * LLVMCreateMCJITCompilerForModule(&jit, mod, 0, 0, &error);
+ */
+LLVMBool LLVMCreateMCJITCompilerForModule(
+  LLVMExecutionEngineRef *OutJIT, LLVMModuleRef M,
+  LLVMMCJITCompilerOptions *Options, size_t SizeOfOptions,
+  char **OutError);
 
 /** Deprecated: Use LLVMCreateExecutionEngineForModule instead. */
 LLVMBool LLVMCreateExecutionEngine(LLVMExecutionEngineRef *OutEE,
@@ -122,7 +156,8 @@ LLVMBool LLVMRemoveModuleProvider(LLVMExecutionEngineRef EE,
 LLVMBool LLVMFindFunction(LLVMExecutionEngineRef EE, const(char) *Name,
                           LLVMValueRef *OutFn);
 
-void *LLVMRecompileAndRelinkFunction(LLVMExecutionEngineRef EE, LLVMValueRef Fn);
+void *LLVMRecompileAndRelinkFunction(LLVMExecutionEngineRef EE,
+                                     LLVMValueRef Fn);
 
 LLVMTargetDataRef LLVMGetExecutionEngineTargetData(LLVMExecutionEngineRef EE);
 
