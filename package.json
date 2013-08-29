@@ -1,0 +1,5 @@
+{
+	"name": "llvm-c",
+	"description": "LLVM D(eimos) interface",
+	"homepage": "https://github.com/jkm/deimos-llvm",
+}
