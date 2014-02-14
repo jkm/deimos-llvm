@@ -1,7 +1,7 @@
 LLVM D(eimos) interface
 =======================
 
-This project provides a [Deimos](http://dlang.org/) interface for
+This project provides a [Deimos](https://github.com/D-Programming-Deimos) interface for
 [LLVM](http://www.llvm.org).
 
 By default it uses the config files provided by LLVM. Specify
